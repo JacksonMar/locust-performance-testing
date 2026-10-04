@@ -1,0 +1,17 @@
+[project]
+name = "locust-performance-testing"
+version = "0.1.0"
+requires-python = ">=3.14"
+dependencies = [
+    "locust>=2.46.6",
+]
+
+
+[tool.locust]
+locustfile = "locustfile.py"
+headless = true
+host = "https://fragstore.ua"
+users = 1
+spawn-rate = 10
+run-time = "10m"
+tags = ["Critical", "Normal"]
