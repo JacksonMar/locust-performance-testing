@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 5
 requires-python = ">=3.14"
 
 [[package]]
@@ -465,10 +465,14 @@ version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "locust" },
+    { name = "requests" },
 ]
 
 [package.metadata]
-requires-dist = [{ name = "locust", specifier = ">=2.46.6" }]
+requires-dist = [
+    { name = "locust", specifier = ">=2.46.6" },
+    { name = "requests", specifier = ">=2.32" },
+]
 
 [[package]]
 name = "markupsafe"

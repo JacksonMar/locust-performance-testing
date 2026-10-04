@@ -2,17 +2,18 @@ import re
 
 import requests
 
-from config import USER_AGENT
+from config import USER_AGENT, HOST, ITEMS_PER_PAGE, TIMEOUT
 
 
 def get_items():
-    response = requests.get("https://fragstore.ua/index.php",
+    response = requests.get(HOST + "/index.php",
                             params={
                                   "dispatch": "products.search", "search_performed": "Y", "q": "", "sl": "uk",
-                                  "sort_by": "timestamp", "sort_order": "desc", "items_per_page": 80,
+                                  "sort_by": "timestamp", "sort_order": "desc", "items_per_page": ITEMS_PER_PAGE,
                                   "layout": "products_multicolumns", "result_ids": "pagination_contents", "is_ajax": 1,
                             },
-                            headers=USER_AGENT
+                            headers=USER_AGENT,
+                            timeout=TIMEOUT,
                             )
 
     html = response.json()["html"]["pagination_contents"]

@@ -2,7 +2,7 @@ import re, html as html_lib
 
 import requests
 
-from config import USER_AGENT, HOST, ITEMS_PER_PAGE
+from config import USER_AGENT, HOST, ITEMS_PER_PAGE, TIMEOUT
 
 
 def read_category(file_path : str):
@@ -18,7 +18,8 @@ def get_items_link(category):
                                  "items_per_page": ITEMS_PER_PAGE,
                                 "layout": "products_multicolumns", "result_ids": "pagination_contents", "is_ajax": 1,
                             },
-                            headers=USER_AGENT
+                            headers=USER_AGENT,
+                            timeout=TIMEOUT,
                             )
 
     html = response.json()["html"]["pagination_contents"]
@@ -34,14 +35,16 @@ def get_brand_name(category):
                                 "layout": "products_multicolumns", "result_ids": "pagination_contents", "is_ajax": 1,
                                 "toggle_filter.set": "Y"
                             },
-                            headers=USER_AGENT
+                            headers=USER_AGENT,
+                            timeout=TIMEOUT,
                             )
 
     requests.post(HOST + "/index.php?dispatch=toggle_filter.set",
                                  data={
                                      "dispatch": "toggle_filter.set", "is_ajax": 1
                                  },
-                                 headers=USER_AGENT
+                                 headers=USER_AGENT,
+                                 timeout=TIMEOUT,
                                  )
     html = response.json()["html"]['pagination_contents']
     brands = re.findall(r'data-brand="([^"]*)"', html)
@@ -51,7 +54,7 @@ def get_brand_name(category):
 
 def get_filters(category):
     """Повертає id варіантів брендів (фільтр 64) і максимальну ціну (фільтр 176) для категорії."""
-    response = requests.get(HOST + category, headers=USER_AGENT)
+    response = requests.get(HOST + category, headers=USER_AGENT, timeout=TIMEOUT)
     html = response.text
     brand_ids = list(dict.fromkeys(re.findall(r'data-ca-filter-id="64" value="(\d+)"', html)))
     m = re.search(r'id="slider_\d+_176_right"[^>]*value="(\d+)"', html)
@@ -60,7 +63,7 @@ def get_filters(category):
 
 
 def filtered_items_from_low_to_high_price(category):
-    response = requests.get(HOST + category, headers=USER_AGENT,
+    response = requests.get(HOST + category, headers=USER_AGENT, timeout=TIMEOUT,
                             params={
                                 "sort_by": "price",
                                 "sort_order": "asc",

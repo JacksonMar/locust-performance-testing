@@ -4,22 +4,22 @@ from locust import HttpUser, task, tag
 from config import DATA_DIR, USER_AGENT, HOST
 from perf.clients.pages import category
 from perf.data.get_items_id import get_items
-from perf.data.moduls import read_category, get_items_link, get_filters, filtered_items_from_low_to_high_price
-from perf.validators.common import *
+from perf.data.moduls import read_category, get_items_link, get_filters
+from perf.validators.common import (
+    check_category_page,
+    check_html_page,
+    check_json_response,
+    check_no_notification_errors,
+    check_page_number,
+    check_response_count_items,
+    check_status_code,
+    check_url_contains,
+)
 
 PRODUCT_IDS = get_items()
 
-class MyLocust(HttpUser):
-
-    @task
-    def my_task(self):
-        self.client.get("/", name="Homepage")
-
-
-
-
 class TestUser(HttpUser):
-    host = "https://fragstore.ua"
+    host = HOST
 
 
     def on_start(self):
@@ -68,6 +68,7 @@ class TestUser(HttpUser):
 
 
 class TestFS(HttpUser):
+    host = HOST
 
     CATEGORIES = read_category(DATA_DIR / "category.csv")
     ITEMS = {c: get_items_link(c) for c in CATEGORIES}
@@ -168,7 +169,7 @@ class TestFS(HttpUser):
     @task
     @tag("Critical")
     def search_by_query(self):
-        query = random.choice(["spider-man", "batman", "iron man"]),
+        query = random.choice(["spider-man", "batman", "iron man"])
         with self.client.get(HOST,
                              name="Search by query",
                             headers=USER_AGENT, catch_response=True,
@@ -187,17 +188,6 @@ class TestFS(HttpUser):
                                 }) as response:
 
             check_status_code(response)
-
-
-
-    def autocomplete_search(self):
-        pass
-
-
-
-
-
-
 
 
 if __name__ == "__main__":
