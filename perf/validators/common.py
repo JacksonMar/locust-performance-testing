@@ -1,3 +1,5 @@
+PRODUCT_MARKER = 'class="product-title"'
+
 
 def check_html_page(response):
     if response.status_code != 200:
@@ -24,7 +26,7 @@ def check_json_response(response):
         return response.json()
     except ValueError:
         response.failure("Response is not a valid JSON")
-        return False
+        return None
 
 
 def check_no_notification_errors(response, data):
@@ -37,10 +39,12 @@ def check_no_notification_errors(response, data):
 
 
 def check_page_number(response, page):
-    if str(page) in response.url:
-        response.success()
-    else:
+    if page <= 1:
+        return True
+    if f"page-{page}" not in response.url:
         response.failure(f"Expected page {page} in URL, got {response.url}")
+        return False
+    return True
 
 
 def check_response_count_items(response):
@@ -57,3 +61,9 @@ def check_url_contains(response, expected_substring):
         response.success()
     else:
         response.failure(f"Expected URL to contain '{expected_substring}', got {response.url}")
+
+def check_has_products(response):
+    if PRODUCT_MARKER not in response.text:
+        response.failure("No products in the response")
+        return False
+    return True

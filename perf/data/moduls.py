@@ -1,4 +1,5 @@
 import re, html as html_lib
+from urllib.parse import urlparse
 
 import requests
 
@@ -23,7 +24,10 @@ def get_items_link(category):
                             )
 
     html = response.json()["html"]["pagination_contents"]
-    items_url = list(dict.fromkeys(re.findall(r'<a href="https://fragstore\.ua(/[^"]+/)"\s+class="product-title"', html)))
+    # the origin is optional and taken from HOST, so a different --host still works
+    origin = re.escape(urlparse(HOST).netloc)
+    pattern = rf'<a href="(?:https?://{origin})?(/[^"]+/)"\s+class="product-title"'
+    items_url = list(dict.fromkeys(re.findall(pattern, html)))
     return items_url
 
 def get_brand_name(category):
@@ -49,11 +53,10 @@ def get_brand_name(category):
     html = response.json()["html"]['pagination_contents']
     brands = re.findall(r'data-brand="([^"]*)"', html)
     brands = [html_lib.unescape(b) for b in brands if b]
-    return list(dict.fromkeys(brands))  # унікальні, порядок збережено
+    return list(dict.fromkeys(brands))
 
 
 def get_filters(category):
-    """Повертає id варіантів брендів (фільтр 64) і максимальну ціну (фільтр 176) для категорії."""
     response = requests.get(HOST + category, headers=USER_AGENT, timeout=TIMEOUT)
     html = response.text
     brand_ids = list(dict.fromkeys(re.findall(r'data-ca-filter-id="64" value="(\d+)"', html)))

@@ -34,10 +34,7 @@ class TestUser(HttpUser):
     @task
     def check_api(self):
         with self.client.get("/", name="Homepage", catch_response=True) as response:
-            if response.status_code != 200:
-                response.failure(f"Expected 200, got {response.status_code}")
-            elif "<html" not in response.text.lower():
-                response.failure("Response is not an HTML page")
+            check_html_page(response)
 
 
 
